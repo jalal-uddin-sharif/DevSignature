@@ -1,0 +1,6 @@
+{
+  "name": "DevSignature",
+  "description": "Developer email signature generator with 22 premium dual-theme templates.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

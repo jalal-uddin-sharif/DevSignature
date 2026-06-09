@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevSignature — Dual-Theme Email Signature for Developers</title>
+    <script>
+      /**
+       * Fully resilient, elite patch to prevent "Uncaught TypeError: Cannot set property fetch of #<Window> which has only a getter"
+       */
+      (() => {
+        let currentFetch = undefined;
+        try {
+          if (typeof fetch !== 'undefined') {
+            currentFetch = fetch;
+          } else if (typeof globalThis !== 'undefined' && 'fetch' in globalThis) {
+            currentFetch = globalThis.fetch;
+          } else if (typeof window !== 'undefined' && 'fetch' in window) {
+            currentFetch = window.fetch;
+          }
+        } catch (e) {}
+
+        const getterSetterDescriptor = {
+          configurable: true,
+          enumerable: true,
+          get() { return currentFetch; },
+          set(val) { currentFetch = val; }
+        };
+
+        const patchPrototypeChain = (startObj) => {
+          if (!startObj) return;
+          let obj = startObj;
+          while (obj && obj !== Object.prototype) {
+            try {
+              const desc = Object.getOwnPropertyDescriptor(obj, 'fetch');
+              if (!desc || desc.configurable !== false) {
+                Object.defineProperty(obj, 'fetch', getterSetterDescriptor);
+              }
+            } catch (err) {}
+            try {
+              obj = Object.getPrototypeOf(obj);
+            } catch (e) {
+              break;
+            }
+          }
+        };
+
+        try { if (typeof globalThis !== 'undefined') patchPrototypeChain(globalThis); } catch (e) {}
+        try { if (typeof window !== 'undefined') patchPrototypeChain(window); } catch (e) {}
+        try { if (typeof self !== 'undefined') patchPrototypeChain(self); } catch (e) {}
+        try { if (typeof Window !== 'undefined' && Window.prototype) patchPrototypeChain(Window.prototype); } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
